@@ -67,7 +67,7 @@ class Vault:
         myFile.close()
 
     def readPasswordList(self, key):
-        pwFile = open("pw-" + self.vaultName + ".dpsm", "r")
+        pwFile = open("pw-" + self.vaultName + ".dspm", "r")
         titles = []
         for line in pwFile:
             fileData = line.split(":")
@@ -80,5 +80,10 @@ class Vault:
     #def appendEntry(self, newPassword, newTitle):
 
     #def removeEntry(self, index):
-        
-        
+
+    #def generatePassword(self, size, alpha):
+
+    #def setUpSync(self, syncOption)
+
+
+            

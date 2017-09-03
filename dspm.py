@@ -12,20 +12,27 @@ class DSPM:
             self.vaultDetails.append(confOptions)
         self.secretKey = "*"
 
-    def menu(self):
+    def menu(self, args):
         print("Welcome to DSPM - Dead Simple Password Manager")
-        print("Options: ") 
-        choice = int(input("(1) Create a new vault\n(2) to open vault\n(3) to quit app\n>"))
-        if choice == 1:
-            self.initVault()
-        elif choice == 2:
-            self.openVault()
-        elif choice == 3:
-            self.running = False
+        if args == None:
+            print("Options: ") 
+            choice = int(input("(1) Create a new vault\n(2) to open vault\n(3) to quit app\n>"))
+            if choice == 1:
+                self.initVault()
+            elif choice == 2:
+                self.openVault()
+            elif choice == 3:
+                self.running = False
+        else:
+            if args[0] == "-c" or args[0] == "create":
+                self.initVault(args[1])
+            elif args[0] == "-o" or args[0] == "open":
+                self.openVault(args[1])
 
-    def initVault(self):
-        vaultName = input("Enter a name for your vault: ")
-        myVault = vault.Vault(vaultName)
+    def initVault(self, name='default'):
+        if name == 'default':
+            name = input("Enter a name for your vault: ")
+        myVault = vault.Vault(name)
         details = myVault.getPassword()
         password = details[0]
         salt = details[1]
@@ -34,9 +41,10 @@ class DSPM:
         myVault.createVaultFile()
         print("Initialisation complete")
 
-    def openVault(self):
-        vaultName = input("Enter the vault name to open: ")
-        myVault = vault.Vault(vaultName)
+    def openVault(self, name='default'):
+        if name == 'default':
+            name = input("Enter the vault name to open: ")
+        myVault = vault.Vault(name)
         self.secretKey = myVault.openVault()
         #if myVault.auth:
             #myVault.readPasswordList()
