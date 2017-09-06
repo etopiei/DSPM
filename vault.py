@@ -1,7 +1,8 @@
 from random import SystemRandom
 import getpass
 from passlib.hash import pbkdf2_sha256
-import aes
+import aes #requires pip install pycrypto
+import googleDrive
 
 ALPHABET = "-+=/|}{'.,<?>~`0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()"
 
@@ -10,6 +11,7 @@ class Vault:
     def __init__(self, name):
         self.vaultName = name
         self.auth = False
+        self.drive = None
 
     def getPassword(self):
         cryptogen = SystemRandom()
@@ -95,6 +97,12 @@ class Vault:
         newPassword = ''.join(cryptogen.choice(alpha) for i in range(size))
         return newPassword
 
+    def getFile(self):
+        if self.drive == None:
+            self.drive = googleDrive.GoogleDrive()
+        self.drive.setFileID(self.vaultName)
+        self.drive.getPasswordFileFromDrive(self.vaultName)
+
     def saveToFile(self, key, vaultData):
         raw_text = ""
         for x in range(len(vaultData)-1):
@@ -118,4 +126,14 @@ class Vault:
         for x in range(len(titles)):
             print(x+1, titles[x], sep=". ")
         print("")
-            
+        
+    def setUpSyncing(self):
+        choice = input("This may open up a browser window to authenticate with google drive.\n Is this ok? (y/n)")
+        if choice == "y":
+            self.drive = googleDrive.GoogleDrive()
+            print("Drive Account Authenticated.")
+
+    def updateDriveFile(self):
+        self.drive.setFileID(self.vaultName)
+        self.drive.syncWithDrive(self.vaultName)
+        

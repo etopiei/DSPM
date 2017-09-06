@@ -6,25 +6,39 @@ class DSPM:
 
     def __init__(self):
         self.running = True
-        #load config from file
-        confFile = open("dspm.conf", "r")
         self.vaultDetails = []
+        #self.getConfigOptions()
+        self.secretKey = "*"
+        self.vaultData = []
+        self.sync = -1
+        #self.checkSyncStatus()
+        
+    """
+    def getConfigOptions():
+        confFile = open("dspm.conf", "r")
         for line in confFile:
             confOptions = line.split(",")
             self.vaultDetails.append(confOptions)
-        self.secretKey = "*"
-        self.vaultData = []
+        self.checkSyncStatus()
 
+    """
+    
     def menu(self, args):
         if args == None:
             print("")
-            print("Options: ") 
-            choice = int(input("(1) Create a new vault\n(2) to open vault\n(3) to quit app\n>"))
+            print("Options: ")
+            print("(1) Create a new vault")
+            print("(2) Open a local vault")
+            print("(3) Load a vault from online drive.")
+            print("(4) Quit")
+            choice = int(input("> "))
             if choice == 1:
                 self.initVault()
             elif choice == 2:
                 self.openVault()
             elif choice == 3:
+                self.loadVaultFromDrive()
+            elif choice == 4:
                 self.running = False
         else:
             if args[0] == "-c" or args[0] == "create":
@@ -44,6 +58,12 @@ class DSPM:
         myVault.createVaultFile()
         print("Initialisation complete")
 
+    def loadVaultFromDrive(self):
+        name = input("Enter the vault name to retrieve: ")
+        myVault = vault.Vault(name)
+        myVault.setUpSyncing()
+        myVault.getFile()
+
     def openVault(self, name='default'):
         if name == 'default':
             name = input("Enter the vault name to open: ")
@@ -61,7 +81,8 @@ class DSPM:
             print("(3) Remove Password")
             print("(4) List Passwords")
             print("(5) Change File Locations")
-            print("(6) Go Back to Main Menu")
+            print("(6) Sync Files")
+            print("(7) Go Back to Main Menu")
         else:
             self.menu(None)
             return
@@ -89,7 +110,30 @@ class DSPM:
             #this will move files.
             print("Move files.")
         elif choice == 6:
+            if self.sync != -1:
+                #syncing has been set up, use correct option
+                self.syncOptions()
+            else:
+                myVault.setUpSyncing()
+                self.syncOptions()
+        elif choice == 7:
             self.menu(None)
             return
             
         self.presentVaultOptions(myVault)
+
+    def syncOptions(self):
+        print("Sync Options:")
+        print("(1) Download Password File From Drive")
+        print("(2) Update Password File On Drive")
+        print("(3) Back to Vault Menu")
+        choice = int(input("> "))
+        if choice == 1:
+            myVault.getFile()
+        elif choice == 2:
+            #myVault.uploadFile()
+            print("This will update file.")
+        elif choice == 3:
+            self.presentVaultOptions()
+
+    #def checkSyncStatus(self):
