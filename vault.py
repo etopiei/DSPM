@@ -25,7 +25,6 @@ class Vault:
         randLength = cryptogen.randrange(60,80)
         randLength += 20
         key = ''.join(cryptogen.choice(ALPHABET) for i in range(randLength))
-        print(key)
         return key
 
     def encryptKey(self, key, userHashedPass):
@@ -62,28 +61,61 @@ class Vault:
         return key
 
     def createVaultFile(self):
-        myFile = open("pw-" + self.vaultName + ".dpsm", "w")
+        myFile = open("pw-" + self.vaultName + ".dspm", "w")
         myFile.write("")
         myFile.close()
 
-    def readPasswordList(self, key):
+    def readPasswordFile(self, key):
         pwFile = open("pw-" + self.vaultName + ".dspm", "r")
+        fileData = pwFile.read()
+        if len(fileData) < 16:
+            #this is a dodgy hack, fix the aes decrypt function to use a better IV
+            noData = []
+            return noData
+        cipher = aes.AESCipher(key)
+        decryptedText = cipher.decrypt(fileData)
+        decryptedData = decryptedText.split("\n")
+        pwFile.close()
+        return decryptedData
+
+    def readEntry(self, index, vaultData):
+        entry = vaultData[index-1].split(":")
+        password = entry[1]
+        print(password)
+
+    def appendEntry(self, newPassword, newTitle):
+        return str(newTitle) + ":" + str(newPassword)
+
+    def removeEntry(self, index, vaultData):
+        del vaultData[index-1]
+        return vaultData
+
+    def generatePassword(self, size, alpha):
+        cryptogen = SystemRandom()
+        newPassword = ''.join(cryptogen.choice(alpha) for i in range(size))
+        return newPassword
+
+    def saveToFile(self, key, vaultData):
+        raw_text = ""
+        for x in range(len(vaultData)-1):
+            raw_text += str(vaultData[x]) + "\n"
+        raw_text += str(vaultData[len(vaultData)-1])
+        cipher = aes.AESCipher(key)
+        dataToWrite = cipher.encrypt(raw_text)
+        myFile = open("pw-" + self.vaultName + ".dspm", "wb")
+        myFile.write(dataToWrite)
+        myFile.close()
+
+    #def moveFiles(self, newLocation, fileOption):
+        #allow moving the files around 
+
+    def printTitles(self, decryptedData):
+        print("")
         titles = []
-        for line in pwFile:
-            fileData = line.split(":")
-            titles.append(fileData[0])
-        for x in range(titles):
+        for i in range(len(decryptedData)):
+            title = decryptedData[i].split(":")
+            titles.append(title[0])
+        for x in range(len(titles)):
             print(x+1, titles[x], sep=". ")
-
-    #def readEntry(self, index):
-
-    #def appendEntry(self, newPassword, newTitle):
-
-    #def removeEntry(self, index):
-
-    #def generatePassword(self, size, alpha):
-
-    #def setUpSync(self, syncOption)
-
-
+        print("")
             
