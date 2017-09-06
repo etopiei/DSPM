@@ -117,5 +117,16 @@ class GoogleDrive:
         print("File uploaded succesfully.")
 
     def syncWithDrive(self, vaultName):
-        print("This will sync with drive.")
-    
+        file_metadata = {
+            'name': 'pw-' + vaultName + '.dspm',    
+        }
+        media = MediaFileUpload("pw-" + vaultName + '.dspm',
+                                mimetype = 'text/plain',
+                                resumable = True)
+                                
+        myFile = self.service.files().update(body=file_metadata,
+                                            media_body = media,
+                                            fileId = self.fileID).execute()
+
+        print("Updated succesfully.")
+        

@@ -112,17 +112,17 @@ class DSPM:
         elif choice == 6:
             if self.sync != -1:
                 #syncing has been set up, use correct option
-                self.syncOptions()
+                self.syncOptions(myVault)
             else:
                 myVault.setUpSyncing()
-                self.syncOptions()
+                self.syncOptions(myVault)
         elif choice == 7:
             self.menu(None)
             return
             
         self.presentVaultOptions(myVault)
 
-    def syncOptions(self):
+    def syncOptions(self, myVault):
         print("Sync Options:")
         print("(1) Download Password File From Drive")
         print("(2) Update Password File On Drive")
@@ -131,8 +131,7 @@ class DSPM:
         if choice == 1:
             myVault.getFile()
         elif choice == 2:
-            #myVault.uploadFile()
-            print("This will update file.")
+            myVault.updateDriveFile()
         elif choice == 3:
             self.presentVaultOptions()
 
