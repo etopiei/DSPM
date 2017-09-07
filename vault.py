@@ -43,6 +43,7 @@ class Vault:
     def writeToFile(self, cipherText, salt):
         myFile = open("secret-" + self.vaultName + ".dspm", "wb")
         myFile.write(str.encode(salt))
+        myFile.write('\n'.encode('utf-8'))
         myFile.write(cipherText)
         myFile.close()
 
@@ -50,8 +51,10 @@ class Vault:
         myFile = open("secret-" + self.vaultName + ".dspm", "rb")
         fileData = myFile.read()
         myFile.close()
-        print()
-        
+        data = fileData.split("\n".encode('utf-8'))
+        mySalt = (data[0]).decode('utf-8')
+        encryptedKey = data[1]
+                        
         password = getpass.getpass()
         hashedPassword = pbkdf2_sha256.hash(password, salt=str.encode(mySalt))
         cipher = aes.AESCipher(hashedPassword)
