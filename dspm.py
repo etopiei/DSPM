@@ -30,7 +30,8 @@ class DSPM:
             print("(1) Create a new vault")
             print("(2) Open a local vault")
             print("(3) Load a vault from online drive.")
-            print("(4) Quit")
+            print("(4) Delete a vault from online drive.")
+            print("(5) Quit")
             choice = int(input("> "))
             if choice == 1:
                 self.initVault()
@@ -39,6 +40,10 @@ class DSPM:
             elif choice == 3:
                 self.loadVaultFromDrive()
             elif choice == 4:
+                myVault = vault.Vault(None)
+                myVault.setUpSyncing()
+                myVault.deleteDriveFile()
+            elif choice == 5:
                 self.running = False
         else:
             if args[0] == "-c" or args[0] == "create":
@@ -126,13 +131,16 @@ class DSPM:
         print("Sync Options:")
         print("(1) Download Password File From Drive")
         print("(2) Update Password File On Drive")
-        print("(3) Back to Vault Menu")
+        print("(3) Delete Password File From Drive")
+        print("(4) Back to Vault Menu")
         choice = int(input("> "))
         if choice == 1:
             myVault.getFile()
         elif choice == 2:
             myVault.updateDriveFile()
         elif choice == 3:
+            myVault.deleteDriveFile()
+        elif choice == 4:
             self.presentVaultOptions()
 
     #def checkSyncStatus(self):

@@ -100,6 +100,10 @@ class GoogleDrive:
         myFile.write(fh.getvalue())
         myFile.close() 
 
+    def deleteFile(self, vaultName):
+        self.service.files().delete(fileId = self.fileID).execute()
+        print("File was deleted")
+
     def addPasswordFileToDrive(self, vaultName):
         file_metadata = {
             'name': 'pw-' + vaultName + '.dspm',

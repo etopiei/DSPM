@@ -9,7 +9,13 @@ ALPHABET = "-+=/|}{'.,<?>~`0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQ
 class Vault:
 
     def __init__(self, name):
-        self.vaultName = name
+    
+        if name == None:
+            newName = input("Enter vault name: ")
+            self.vaultName = newName
+        else:
+            self.vaultName = name
+            
         self.auth = False
         self.drive = None
 
@@ -36,29 +42,21 @@ class Vault:
 
     def writeToFile(self, cipherText, salt):
         myFile = open("secret-" + self.vaultName + ".dspm", "wb")
+        myFile.write(str.encode(salt))
         myFile.write(cipherText)
         myFile.close()
-        
-        myFile2 = open("salt-" + self.vaultName + ".dspm", "w")
-        myFile2.write(salt)
-        myFile2.close()
 
     def openVault(self):
         myFile = open("secret-" + self.vaultName + ".dspm", "rb")
         fileData = myFile.read()
         myFile.close()
-        encryptedKey = fileData
-
-        myFile2 = open("salt-" + self.vaultName + ".dspm", "r")
-        fileData = myFile2.read()
-        myFile2.close()
-        mySalt = fileData
+        print()
         
         password = getpass.getpass()
         hashedPassword = pbkdf2_sha256.hash(password, salt=str.encode(mySalt))
         cipher = aes.AESCipher(hashedPassword)
         key = cipher.decrypt(encryptedKey)
-        print("Authentication success.")
+        print("Vault opened.")
         self.auth = True
         return key
 
@@ -136,4 +134,8 @@ class Vault:
     def updateDriveFile(self):
         self.drive.setFileID(self.vaultName)
         self.drive.syncWithDrive(self.vaultName)
+
+    def deleteDriveFile(self):
+        self.drive.setFileID(self.vaultName)
+        self.drive.deleteFile(self.vaultName)
         
